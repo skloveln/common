@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.user.dao.UserDeviceDao" >
+
+    <insert id="insert">
+      INSERT INTO lb_user_device (
+        <if test="deviceImei != null and deviceImei != ''">
+            device_imei,
+        </if>
+        device_push_id,
+        user_id,
+        app_os,
+        create_time
+      ) VALUE (
+        <if test="deviceImei != null and deviceImei != ''">
+            #{deviceImei},
+        </if>
+        #{devicePushId},
+        #{userId},
+        #{appOS},
+        #{createTime}
+      )
+    </insert>
+
+    <update id="update">
+        UPDATE
+          lb_user_device
+        SET
+        <if test="deviceImei != null and deviceImei != ''">
+            device_imei = #{deviceImei},
+        </if>
+          device_push_id = #{devicePushId},
+          update_time = #{updateTime},
+          app_os = #{appOS}
+        WHERE
+          user_id = #{userId}
+    </update>
+
+    <select id="findByDeviceToken" resultType="UserDevice">
+      SELECT
+        *
+      FROM
+        lb_user_device
+      WHERE
+        device_push_id = #{devicePushId}
+    </select>
+
+    <delete id="delete">
+      DELETE
+      FROM
+        lb_user_device
+      WHERE
+        device_push_id = #{devicePushId}
+      OR
+        user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByDeviceToken">
+        DELETE
+        FROM
+        lb_user_device
+        WHERE
+        device_push_id = #{devicePushId}
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE
+        FROM
+        lb_user_device
+        WHERE
+        user_id = #{userId}
+    </delete>
+</mapper>

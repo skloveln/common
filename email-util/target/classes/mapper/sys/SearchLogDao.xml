@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.sys.dao.SearchLogDao" >
+
+    <resultMap id="SearchLog" type="cn.zpc.mvc.sys.entity.SearchLog">
+        <id column="id" property="id"></id>
+        <result column="user_id" property="userId"></result>
+        <result column="keyword" property="keyword"></result>
+        <result column="others" property="others"></result>
+        <result column="type" property="type"></result>
+        <result column="create_time" property="createTime"></result>
+    </resultMap>
+
+    <resultMap id="SearchResult" type="cn.zpc.mvc.sys.entity.SearchResult">
+        <id column="id" property="id"></id>
+        <result column="type" property="type"></result>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+          lb_search_log
+        (
+          user_id,
+          keyword,
+          <if test="others != null">
+              others,
+          </if>
+          type,
+          create_time
+        )VALUES (
+          #{userId},
+          #{keyword},
+        <if test="others!=null">
+            #{others},
+        </if>
+          #{type},
+          #{createTime}
+        )
+    </insert>
+
+    <select id="getHotKeywords" resultMap="SearchLog">
+        SELECT
+          *
+        FROM
+          lb_search_log
+        WHERE
+          DATEDIFF(now(), create_time) &lt;= 6
+        GROUP BY keyword
+        ORDER BY COUNT(keyword) desc, create_time desc
+        LIMIT 10
+    </select>
+
+    <insert id="insertHotWords">
+        INSERT INTO
+          lb_search_hot_keywords
+        (
+          keywords,
+          create_time
+        )VALUES (
+          #{keywords},
+          #{createTime}
+        )
+    </insert>
+
+    <select id="search" resultMap="SearchResult">
+(
+        SELECT
+          t1.id, 1 as type
+        FROM
+          lb_scene_info t1 LEFT JOIN lb_scene_type t2
+        ON t1.scene_type_id = t2.id
+        WHERE
+            t1.deleted = 0
+        AND
+            t1.status = 1
+        <if test="keywords != null and keywords != ''">
+            AND
+            concat(t1.scene_name,t2.scene_type_name,t1.scene_keyword,t1.scene_area,t1.scene_desc,t1.scene_address,t1.price,t1.price_type)
+            LIKE
+            concat('%',#{keywords},'%')
+        </if>
+        <if test="address != null and address != ''">
+            AND
+            t1.scene_address LIKE concat('%',#{address},'%')
+        </if>
+        <if test="type != null and type.size > 0">
+            AND
+            t1.scene_type_id
+            IN
+            <foreach item="item" index="index" collection="type" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="priceType!=null and priceType!=0">
+            AND
+            t1.price_type = #{priceType}
+        </if>
+        <if test="priceMin !=null">
+            AND
+            t1.price BETWEEN #{priceMin} AND #{priceMax}
+        </if>
+        <if test="areaMin != null">
+            AND
+            t1.scene_area BETWEEN #{areaMin} AND #{areaMax}
+        </if>
+        ORDER BY t1.hot DESC
+)
+        UNION
+(
+        SELECT
+        id, 2 as type
+        FROM
+        lb_album
+        WHERE
+        status = 1
+        AND
+        deleted = 0
+        <if test="address!=null and address!=''">
+            AND
+            address like concat('%',#{address},'%')
+        </if>
+        <if test="keywords !=null and keywords != ''">
+            AND
+            (
+            tags like concat('%',#{keywords},'%')
+            OR
+            `describe` like concat('%',#{keywords},'%')
+            )
+        </if>
+)
+        UNION
+(
+        SELECT
+        id, 3 as type
+        FROM
+        lb_scene_extra
+        WHERE
+        deleted = 0
+        AND
+        keywords like concat('%',#{keywords},'%')
+        <if test="address!=null and address!=''">
+            AND
+            keywords like concat('%',#{address},'%')
+        </if>
+)
+    </select>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.scene.dao.SceneTypeDao" >
+
+    <resultMap id="SceneType" type="cn.zpc.mvc.scene.entity.SceneType">
+        <id column="id" property="id" ></id>
+        <result property="sceneTypeName" column="scene_type_name"></result>
+        <result property="sceneTypeParentId" column="scene_type_parent_id"></result>
+        <result property="imageUrl" column="image_name"></result>
+        <result property="hot" column="hot"></result>
+        <result property="deleted" column="deleted"></result>
+    </resultMap>
+
+    <select id="get" resultMap="SceneType">
+        SELECT *
+        FROM
+          lb_scene_type
+        WHERE
+          id=#{id}
+          AND
+          deleted=0
+    </select>
+
+    <select id="getTopTypes" resultMap="SceneType">
+        select
+        t.id,
+        t.scene_type_name,
+        t.scene_type_parent_id
+        from lb_scene_type t
+        where
+        t.scene_type_parent_id = 0
+        and deleted = false
+    </select>
+
+    <select id="getChildTypes" parameterType="Integer" resultType="Map" resultMap="SceneType">
+        select
+        scene_type_name,
+        id,
+        scene_type_parent_id
+        from lb_scene_type
+        where
+        scene_type_parent_id = #{id}
+        and deleted = false
+    </select>
+
+    <select id="getHotTypes" resultMap="SceneType">
+        SELECT
+          id,
+          image_name,
+          scene_type_name
+        FROM
+          lb_scene_type
+        WHERE
+          hot = 1
+        AND
+          deleted = 0
+    </select>
+
+</mapper>

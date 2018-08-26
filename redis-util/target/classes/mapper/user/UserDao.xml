@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zpc.mvc.user.dao.UserDao" >
+
+  <sql id="userColumns">
+    t.id,
+    t.age,
+    t.password,
+    t.salt,
+    t.nickname,
+    t.email,
+    t.phone,
+    t.profession,
+    t.status,
+    t.gender,
+    t.avatar,
+    t.create_date
+  </sql>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO lb_user (
+      nickname,
+      email,
+      phone,
+      password,
+      salt,
+      profession,
+      gender,
+      age,
+      avatar,
+      create_date
+    ) VALUES (
+      #{nickname},
+      #{email},
+      #{phone},
+      #{password},
+      #{salt},
+      #{profession},
+      #{gender},
+      #{age},
+      #{avatar},
+      #{createDate}
+    )
+  </insert>
+
+  <update id="update">
+    UPDATE lb_user
+    SET
+    <if test="nickname != null">
+      nickname = #{nickname},
+    </if>
+    <if test="email != null">
+      email = #{email},
+    </if>
+    <if test="phone != null">
+      phone = #{phone},
+    </if>
+    <if test="salt != null">
+      salt = #{salt},
+    </if>
+    <if test="profession != null">
+      profession = #{profession},
+    </if>
+    <if test="gender != null">
+      gender = #{gender},
+    </if>
+    <if test="age != null">
+      age = #{age},
+    </if>
+    <if test="password != null">
+      password = #{password},
+    </if>
+    <if test="avatar != null">
+      avatar = #{avatar},
+    </if>
+    <if test="status != null">
+      status = #{status},
+    </if>
+    <if test="createDate != null">
+      create_date = #{createDate},
+    </if>
+    <if test="deleted != null">
+      deleted = #{deleted}
+    </if>
+    WHERE id = #{id}
+  </update>
+
+  <select id="get" resultType="User">
+    SELECT
+      <include refid="userColumns" />
+    FROM
+        lb_user t
+    WHERE
+        t.id = #{id}
+    AND
+      deleted = 0
+  </select>
+
+  <select id="getUserByPhone" resultType="User">
+    SELECT
+      <include refid="userColumns"/>
+    FROM
+        lb_user t
+    WHERE
+        t.phone = #{phone}
+    AND
+      deleted = 0
+  </select>
+
+  <select id="countLoginCodeByPhone" resultType="java.lang.Integer">
+    SELECT COUNT(id) FROM lb_user_log
+    WHERE `key` = 'LoginCode'
+    AND text LIKE CONCAT('%',#{phone},'%')
+    AND create_date > now() - interval 3 HOUR
+  </select>
+
+  <select id="countBindCodeByPhone" resultType="java.lang.Integer">
+    SELECT COUNT(id) FROM lb_user_log
+    WHERE `key` = 'BindCode'
+    AND text LIKE CONCAT('%',#{phone},'%')
+    AND create_date > now() - interval 3 HOUR
+  </select>
+
+  <select id="countChangePhoneCodeByPhone" resultType="java.lang.Integer">
+    SELECT COUNT(id) FROM lb_user_log
+    WHERE `key` = 'ChangePhoneCode'
+    AND text LIKE CONCAT('%',#{phone},'%')
+    AND create_date > now() - interval 3 HOUR
+  </select>
+
+  <select id="countRegisterCodeByPhone" resultType="java.lang.Integer">
+    SELECT COUNT(id) FROM lb_user_log
+    WHERE `key` = 'RegisterCode'
+    AND text LIKE CONCAT('%',#{phone},'%')
+    AND create_date > now() - interval 3 HOUR
+  </select>
+
+  <select id="countResetPasswordCodeByPhone" resultType="java.lang.Integer">
+    SELECT COUNT(id) FROM lb_user_log
+    WHERE `key` = 'ResetPasswordCode'
+    AND text LIKE CONCAT('%',#{phone},'%')
+    AND create_date > now() - interval 3 HOUR
+  </select>
+
+  <update id="updateAvatar">
+    UPDATE lb_user
+    SET
+    avatar = #{fileKey}
+    WHERE id = #{userId}
+  </update>
+
+  <select id="selectProfession" resultType="String">
+    SELECT
+      profession
+    FROM
+      lb_user_profession
+  </select>
+
+  <select id="isNewUser" resultType="Integer">
+    SELECT
+      user_id
+    FROM
+      lb_user_new
+    WHERE
+      user_id = #{userId} limit 1
+  </select>
+
+  <select id="getUserCode" resultType="String">
+    SELECT
+      code
+    FROM
+      lb_user_code
+    WHERE
+      user_id = #{userId} limit 1
+  </select>
+
+  <insert id="insertUserCode">
+    INSERT
+    lb_user_code(
+      user_id,
+      code
+    )VALUES (
+      #{userId},
+      #{code}
+    )
+  </insert>
+
+  <select id="countInvitatoryNum" resultType="Integer">
+    SELECT
+      count(*)
+    FROM
+      lb_user_invitation
+    WHERE
+      old_user_id = #{userId}
+  </select>
+
+  <select id="getInviteUser" resultType="Integer">
+    SELECT
+      user_id
+    FROM
+      lb_user_code
+    WHERE
+      code = #{code}
+    AND
+      user_id != #{userId}
+  </select>
+
+  <update id="updateIntegral">
+    UPDATE
+      lb_user_code
+    SET
+      integral = integral + 1
+    WHERE
+      user_id = #{userId}
+  </update>
+
+  <update id="deleteIntegral">
+    UPDATE
+    lb_user_code
+    SET
+    integral = integral - 5
+    WHERE
+    user_id = #{userId}
+  </update>
+
+  <select id="getUserIntegral" resultType="Integer">
+    SELECT
+      integral
+    FROM
+      lb_user_code
+    WHERE
+      user_id = #{userId}
+  </select>
+
+  <insert id="insertCodeLog">
+    INSERT
+    lb_user_invitation(
+      old_user_id,
+      new_user_id
+    )VALUES (
+      #{oldUserId},
+      #{newUserId}
+    )
+  </insert>
+
+  <insert id="insertNewUser">
+    INSERT
+    lb_user_new(
+      user_id
+    )VALUES (
+      #{userId}
+    )
+  </insert>
+
+  <delete id="deleteNewUser">
+    DELETE
+    FROM
+    lb_user_new
+    WHERE
+    user_id = #{userId}
+  </delete>
+
+  <insert id="insertPrize">
+    INSERT INTO
+    lb_user_code_prize
+    (
+      user_id
+    )
+    VALUES (
+      #{userId}
+    )
+  </insert>
+</mapper>

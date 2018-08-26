@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.store.dao.StoreDao" >
+
+    <resultMap id="Store" type="cn.zpc.mvc.store.entity.Store">
+        <id property="id" column="id"></id>
+        <result property="userId" column="user_id"></result>
+        <result property="type" column="type"></result>
+        <!--<result property="operation" column="operation"></result>-->
+        <result property="name" column="name"></result>
+        <result property="logo" column="logo"></result>
+        <result property="address" column="address"></result>
+        <result property="status" column="status"></result>
+        <result property="hot" column="hot"></result>
+        <result property="mainImage" column="main_image"></result>
+        <result property="openTime" column="open_time"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="expireTime" column="expire_time"></result>
+        <result property="style" column="style"></result>
+        <result property="type" column="type"></result>
+        <result property="remark" column="remark"></result>
+        <result property="introduction" column="introduction"></result>
+    </resultMap>
+
+    <select id="get" resultMap="Store">
+        SELECT *
+        FROM
+          lb_store
+        WHERE
+          id = #{id}
+    </select>
+
+    <delete id="delete">
+        DELETE
+        FROM
+          lb_store
+        WHERE
+          user_id = #{userId}
+    </delete>
+
+    <update id="update">
+        UPDATE
+          lb_store
+        SET
+        <if test="userId != null">
+            user_id = #{userId},
+        </if>
+        <if test="type != null">
+            type = #{type},
+        </if>
+        <if test="style != null">
+            style = #{style},
+        </if>
+        <if test="status!=null">
+            status = #{status},
+        </if>
+        <if test="name != null">
+            name = #{name},
+        </if>
+        <if test="mainImage != null and mainImage != ''">
+            main_image = #{mainImage},
+        </if>
+        <if test="logo != null and logo !=''">
+            logo = #{logo},
+        </if>
+        <if test="introduction != null">
+            introduction = #{introduction},
+        </if>
+        <if test="remark != null">
+            remark = #{remark},
+        </if>
+        <if test="hot != null">
+            hot = #{hot},
+        </if>
+        <if test="openTime != null and openTime != ''">
+            open_time = #{openTime},
+        </if>
+        <if test="province != null">
+            province = #{province},
+        </if>
+        <if test="city != null">
+            city = #{city},
+        </if>
+        <if test="address != null">
+            address = #{address}
+        </if>
+        WHERE
+          id = #{id}
+    </update>
+
+
+    <select id="getByUser" resultMap="Store">
+        SELECT
+          *
+        FROM
+          lb_store
+        WHERE
+          user_id = #{userId}
+    </select>
+
+
+    <select id="getOperations" resultType="Integer">
+        SELECT store_service_id
+        FROM
+          lb_store_with_operation
+        WHERE
+          store_id = #{storeId}
+    </select>
+
+
+    <select id="getHotStore" resultMap="Store">
+        SELECT t1.*
+        FROM
+          lb_store t1
+        WHERE
+          t1.status = 0
+        AND
+          (SELECT count(*) as num from lb_scene_info t2 WHERE t1.user_id = t2.user_id and t2.deleted=0 and t2.status=1) &gt;= 3
+        ORDER BY t1.hot DESC
+    </select>
+
+
+    <select id="search" resultMap="Store">
+      SELECT DISTINCT t1.*
+      FROM
+        lb_store t1 LEFT JOIN lb_scene_info t2
+      ON
+        t1.user_id = t2.user_id
+      WHERE
+        t1.status = 0
+        <if test="keyword != null and keyword !=''">
+      AND
+        concat(t1.name, t1.address) LIKE concat('%',#{keyword},'%')
+        </if>
+        <if test="address!=null and address!=''">
+      AND
+        t1.address LIKE concat('%', #{address}, '%')
+        </if>
+        <if test="style != null and style !=0">
+      AND
+        t1.style = #{style}
+        </if>
+        <if test="type != null and type !=0">
+      AND
+        t1.type = #{type}
+        </if>
+      ORDER BY t1.hot DESC
+    </select>
+
+
+    <select id="getList" resultMap="Store">
+        SELECT *
+        FROM
+          lb_store
+        WHERE
+          status = 0
+    </select>
+
+
+    <select id="getNewList" resultMap="Store">
+        SELECT *
+        FROM
+        lb_store
+        WHERE
+        status = 0
+        order by create_time desc
+    </select>
+
+    
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.sky</groupId>
+    <artifactId>CommonUtils</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0</version>
+
+    <name>CommonUtils</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maveredis-utiln.compiler.source>1.7</maveredis-utiln.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.compilerVersion>1.7</maven.compiler.compilerVersion>
+    </properties>
+
+    <modules>
+        <module>redis-util</module>
+        <module>common-util</module>
+        <module>lock-util</module>
+        <module>email-util</module>
+    </modules>
+
+    <profiles>
+        <!-- 多环境配置 -->
+        <profile>
+            <!-- 开发环境默认激活 -->
+            <id>dev</id>
+            <properties>
+                <active>dev</active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <!-- 测试环境 -->
+            <id>stg</id>
+            <properties>
+                <active>stg</active>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 发布环境-->
+            <id>pro</id>
+            <properties>
+                <active>pro</active>
+            </properties>
+        </profile>
+    </profiles>
+
+    <developers>
+        <developer>
+            <id>sky</id>
+            <name>sky</name>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+
+</project>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.store.dao.StoreContactsDao" >
+
+    <resultMap id="StoreContacts" type="cn.zpc.mvc.store.entity.StoreContacts">
+        <id property="id" column="id"></id>
+        <result property="storeId" column="store_id"></result>
+        <result property="phone" column="phone"></result>
+        <result property="name" column="name"></result>
+    </resultMap>
+
+    <select id="getListByStoreId" resultMap="StoreContacts">
+        SELECT
+          *
+        FROM
+          lb_store_with_contacts
+        WHERE
+          store_id = #{storeId}
+    </select>
+
+    <select id="getByStoreIdAndPhone">
+        SELECT
+          *
+        FROM
+          lb_store_with_contacts
+        WHERE
+          store_id = #{storeId}
+        AND
+          phone = #{phone}
+    </select>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+          lb_store_with_contacts
+        (
+          store_id,
+          name,
+          phone
+        )
+        VALUES
+        (
+          #{storeId},
+          #{name},
+          #{phone}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE
+        FROM
+         lb_store_with_contacts
+        WHERE
+          id = #{id}
+    </delete>
+
+
+
+</mapper>

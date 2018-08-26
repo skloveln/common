@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.store.dao.StoreFriendlyDao" >
+
+    <select id="getFriendly" resultType="String">
+        SELECT
+          friendly
+        FROM
+          lb_store_friendly
+        WHERE
+          store_id = #{storeId}
+    </select>
+
+    <delete id="delete">
+        DELETE
+        FROM
+        lb_store_friendly
+        WHERE
+          store_id = #{storeId}
+    </delete>
+
+    <insert id="insert">
+        INSERT
+          lb_store_friendly
+        (
+          store_id,
+          friendly
+        )
+        VALUES
+        (
+          #{storeId},
+          #{ids}
+        )
+    </insert>
+</mapper>

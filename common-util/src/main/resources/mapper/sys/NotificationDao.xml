@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.sys.dao.NotificationDao" >
+
+    <resultMap id="Notification" type="cn.zpc.mvc.sys.entity.Notification">
+        <id property="id" column="id"></id>
+        <result property="userId" column="user_id"></result>
+        <result property="cause" column="cause"></result>
+        <result property="type" column="type"></result>
+        <result property="ext" column="ext"></result>
+        <result property="pass" column="pass"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="content" column="content"></result>
+        <result property="imageUrl" column="image"></result>
+    </resultMap>
+
+    <select id="findPass" resultMap="Notification">
+      SELECT
+        *
+      FROM
+        lb_notification
+      WHERE
+      (
+        `type` = 1
+        OR
+        `type` = 2
+      )
+      AND
+        pass = 1
+      AND
+        user_id = #{userId}
+      ORDER BY create_time DESC
+    </select>
+
+    <select id="findNoPass" resultMap="Notification">
+        SELECT
+        *
+        FROM
+        lb_notification
+        WHERE
+        (
+        `type` = 1
+        OR
+        `type` = 2
+        )
+        AND
+          pass = 0
+        AND
+          user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findSystem" resultMap="Notification">
+        SELECT
+        *
+        FROM
+        lb_notification
+        WHERE
+        (
+        `type` = 3
+        AND
+        user_id = #{userId}
+        )
+        OR
+        `type` > 3
+        ORDER BY create_time DESC
+    </select>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zpc.mvc.user.dao.UserTokenDao" >
+
+    <sql id="userTokenColumns">
+        t.id,
+        t.user_id AS "user.id",
+        t.token,
+        t.expired_date,
+        t.create_time,
+        t.access_time,
+        t.count
+    </sql>
+
+    <select id="findUserTokenByUserId" resultType="UserToken">
+        SELECT
+        <include refid="userTokenColumns"/>
+        FROM lb_user_token t
+        WHERE t.user_id = #{userId}
+    </select>
+
+    <select id="findUserBySwapToken" resultType="UserToken">
+        SELECT
+        t2.salt AS "user.salt",
+        <include refid="userTokenColumns"/>
+        FROM lb_user_token t1
+        RIGHT JOIN lb_user t2 on t1.user_id = t2.id
+        WHERE t1.token = #{swapToken}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO lb_user_token (
+            user_id,
+            token,
+            expired_date,
+            create_time,
+            access_time,
+            count
+        ) VALUES (
+            #{user.id},
+            #{token},
+            #{expiredDate},
+            #{createTime},
+            #{accessTime},
+            #{count}
+        )
+
+    </insert>
+
+    <update id="update">
+        UPDATE
+        lb_user_token
+        SET
+        <if test="user != null">
+            user_id = #{user.id},
+        </if>
+        <if test="token != null">
+            token = #{token},
+        </if>
+        <if test="expiredDate != null">
+            expired_date = #{expiredDate},
+        </if>
+        <if test="createTime != null">
+            create_time = #{createTime},
+        </if>
+        <if test="accessTime != null">
+        access_time = #{accessTime},
+        </if>
+        count = #{count}
+
+        WHERE id = #{id}
+    </update>
+
+</mapper>

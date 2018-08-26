@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zpc.mvc.user.dao.UserAccountDao" >
+
+  <resultMap id="UserAccount" type="cn.zpc.mvc.user.entity.UserAccount">
+    <id property="id" column="id"></id>
+    <result property="userId" column="user_id"></result>
+    <result property="integral" column="integral"></result>
+  </resultMap>
+
+  <select id="getByUserId" resultMap="UserAccount">
+    SELECT * FROM
+      lb_user_account
+    WHERE
+      user_id = #{userId}
+  </select>
+
+  <update id="update">
+    UPDATE
+    lb_user_account
+    SET
+    <if test="userId != null">
+      user_id = #{userId},
+    </if>
+    <if test="integral != null">
+      integral = #{integral}
+    </if>
+    WHERE
+      id = #{id}
+  </update>
+
+  <insert id="insert">
+    INSERT INTO
+      lb_user_account
+    (
+      user_id,
+      integral
+    )
+    VALUES
+    (
+      #{userId},
+      #{integral}
+    )
+  </insert>
+
+</mapper>

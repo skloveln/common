@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zpc.mvc.user.dao.UserCollectionDao" >
+
+  <resultMap id="SceneInfo" type="cn.zpc.mvc.scene.entity.SceneInfo">
+    <id column="id" property="id" ></id>
+    <result property="sceneName" column="scene_name"></result>
+    <result property="sceneTypeId" column="scene_type_id"></result>
+    <result property="sceneKeyword" column="scene_keyword"></result>
+    <result property="sceneArea" column="scene_area"></result>
+    <result property="scenePrice" column="price"></result>
+    <result property="scenePriceType" column="price_type"></result>
+    <result property="sceneDesc" column="scene_desc"></result>
+    <result property="sceneAddress" column="scene_address"></result>
+    <result property="lat" column="lat"></result>
+    <result property="lon" column="lon"></result>
+    <result property="status" column="status"></result>
+    <result property="vrUrl" column="vr_url"></result>
+    <result property="hot" column="hot"></result>
+  </resultMap>
+
+  <resultMap id="Store" type="cn.zpc.mvc.store.entity.Store">
+    <id property="id" column="id"></id>
+    <result property="userId" column="user_id"></result>
+    <result property="name" column="name"></result>
+    <result property="avatar" column="avatar"></result>
+    <result property="logo" column="logo"></result>
+    <result property="address" column="address"></result>
+    <result property="status" column="status"></result>
+    <result property="hot" column="hot"></result>
+    <result property="mainImage" column="main_Image"></result>
+    <result property="createTime" column="createTime"></result>
+  </resultMap>
+
+  <resultMap id="UserCollection" type="cn.zpc.mvc.user.entity.UserCollection">
+    <id property="id" column="id"></id>
+    <result property="userId" column="user_id"></result>
+    <result property="collectionType" column="collection_type"></result>
+    <result property="targetId" column="target_id"></result>
+    <result property="updateTime" column="update_time"></result>
+    <result property="createTime" column="create_time"></result>
+    <result property="deleted" column="deleted"></result>
+  </resultMap>
+
+  <resultMap id="Album" type="cn.zpc.mvc.album.entity.Album">
+    <id property="id" column="id"></id>
+    <result property="userId" column="user_id"></result>
+    <result property="describe" column="describe"></result>
+    <result property="province" column="province"></result>
+    <result property="city" column="city"></result>
+    <result property="address" column="address"></result>
+    <result property="phone" column="phone"></result>
+    <result property="tags" column="tags"></result>
+    <result property="createTime" column="create_time"></result>
+    <result property="likeNum" column="like_num"></result>
+    <result property="repostNum" column="repost_num"></result>
+    <result property="groupNum" column="group_num"></result>
+  </resultMap>
+
+  <resultMap id="SearchResult" type="cn.zpc.mvc.sys.entity.SearchResult">
+    <id column="id" property="id"></id>
+    <result column="type" property="type"></result>
+  </resultMap>
+
+  <select id="getCollection" resultMap="UserCollection">
+    SELECT * FROM
+      lb_user_collection
+    WHERE
+      user_id = #{userId}
+      AND
+      collection_type = #{collectionType}
+      AND
+      target_id = #{targetId}
+  </select>
+
+  <select id="getStoreList" resultMap="Store">
+    SELECT t1.* FROM
+      lb_store t1, lb_user_collection t2
+    WHERE
+      t2.user_id = #{userId}
+      AND
+      t2.collection_type = 0
+      AND
+      t1.id = t2.target_id
+      AND
+      t2.deleted = 0
+      ORDER BY t1.hot DESC
+  </select>
+
+  <select id="getAlbumList" resultMap="Album">
+    SELECT t1.* FROM
+    lb_album t1, lb_user_collection t2
+    WHERE
+    t2.user_id = #{userId}
+    AND
+    t2.collection_type = 2
+    AND
+    t1.id = t2.target_id
+    AND
+    t2.deleted = 0
+    ORDER BY t2.create_time DESC
+  </select>
+
+  <select id="getSceneAlbumList" resultMap="SearchResult">
+    SELECT
+      target_id as id,
+      collection_type as type
+    FROM
+      lb_user_collection
+    WHERE
+      user_id = #{userId}
+      AND
+      (
+      collection_type = 2
+      OR
+      collection_type = 1
+      )
+      AND
+      deleted = 0
+    ORDER BY create_time DESC
+  </select>
+
+  <select id="getSceneList" resultMap="SceneInfo">
+    SELECT t1.* FROM
+      lb_scene_info t1, lb_user_collection t2
+    WHERE
+      t2.user_id = #{userId}
+      AND
+      t2.collection_type = 1
+      AND
+      t1.id = t2.target_id
+      AND
+      t2.deleted = 0
+      ORDER BY t1.hot DESC
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO
+      lb_user_collection (
+        user_id,
+        collection_type,
+        target_id,
+        update_time,
+        create_time,
+        deleted
+      )  VALUES (
+        #{userId},
+        #{collectionType},
+        #{targetId},
+        #{updateTime},
+        #{createTime},
+        #{deleted}
+      )
+  </insert>
+
+  <update id="update">
+    UPDATE
+      lb_user_collection
+    SET
+    <if test="userId != null">
+      user_id = #{userId},
+    </if>
+    <if test="collectionType != null">
+      collection_type = #{collectionType},
+    </if>
+    <if test="targetId != null">
+      target_id = #{targetId},
+    </if>
+    <if test="updateTime != null">
+      update_time = #{updateTime},
+    </if>
+    <if test="createTime != null">
+      create_time = #{createTime},
+    </if>
+    <if test="deleted != null">
+      deleted = #{deleted}
+    </if>
+    WHERE
+      id = #{id}
+  </update>
+
+</mapper>

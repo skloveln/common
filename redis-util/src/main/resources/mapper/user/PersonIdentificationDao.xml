@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zpc.mvc.user.dao.PersonIdentificationDao" >
+
+  <resultMap id="PersonIdentification" type="cn.zpc.mvc.user.entity.PersonIdentification">
+    <id property="id" column="id"></id>
+    <result property="userId" column="user_id"></result>
+    <result property="name" column="name"></result>
+    <result property="idcardFront" column="idcard_front"></result>
+    <result property="idcardBack" column="idcard_back"></result>
+    <result property="createTime" column="create_time"></result>
+    <result property="status" column="status"></result>
+    <result property="cause" column="cause"></result>
+  </resultMap>
+
+  <select id="getByUserId" resultMap="PersonIdentification">
+    SELECT * FROM
+    lb_identification_person
+    WHERE
+    user_id = #{userId}
+    AND
+    deleted = 0
+  </select>
+
+  <update id="delete">
+    UPDATE
+    lb_identification_person
+    SET
+    deleted = 1
+    WHERE
+    user_id = #{userId}
+  </update>
+
+  <update id="update">
+    UPDATE
+    lb_identification_person
+    SET
+    <if test="userId != null">
+      user_id = #{userId},
+    </if>
+    <if test="idcardFront != null">
+      idcard_front = #{idcardFront},
+    </if>
+    <if test="idcardBack != null">
+      idcard_back = #{idcardBack},
+    </if>
+    <if test="createTime != null">
+      create_time = #{createTime},
+    </if>
+    <if test="status != null">
+      status = #{status},
+    </if>
+    <if test="cause != null">
+      cause = #{cause},
+    </if>
+    <if test="name != null">
+      name = #{name}
+    </if>
+    WHERE
+    id = #{id}
+  </update>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO
+      lb_identification_person
+    (
+      user_id,
+      name,
+      idcard_front,
+      idcard_back,
+      create_time,
+      status
+    )
+    VALUES
+    (
+      #{userId},
+      #{name},
+      #{idcardFront},
+      #{idcardBack},
+      #{createTime},
+      #{status}
+    )
+  </insert>
+
+</mapper>
