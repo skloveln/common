@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.album.dao.AlbumErrorDao" >
+
+    <resultMap id="AlbumComment" type="cn.zpc.mvc.album.entity.AlbumComment">
+        <id property="id" column="id"></id>
+        <result property="userId" column="user_id"></result>
+        <result property="albumId" column="album_id"></result>
+        <result property="replyUserId" column="reply_user_id"></result>
+        <result property="content" column="content"></result>
+        <result property="createTime" column="create_time"></result>
+    </resultMap>
+
+    <select id="getAllError" resultMap="AlbumComment">
+        SELECT
+          *
+        FROM
+          lb_album_error
+        WHERE
+          album_id = #{albumId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="get" resultMap="AlbumComment">
+        SELECT
+          *
+        FROM
+          lb_album_error
+        WHERE
+          id = #{id}
+    </select>
+
+    <select id="getErrorCount" resultType="Integer">
+        SELECT
+          count(*)
+        FROM
+          lb_album_error
+        WHERE
+          album_id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT
+          lb_album_error
+        (
+          <if test="replyUserId != null">
+              reply_user_id,
+          </if>
+          album_id,
+          user_id,
+          content
+        )VALUES
+        (
+        <if test="replyUserId != null">
+            #{replyUserId},
+        </if>
+          #{albumId},
+          #{userId},
+          #{content}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE
+        FROM
+          lb_album_error
+        WHERE
+          id = #{id}
+        AND
+          user_id = #{userId}
+    </delete>
+</mapper>

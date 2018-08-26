@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.scene.dao.SceneNewsDao" >
+
+    <resultMap id="SceneNews" type="cn.zpc.mvc.scene.entity.SceneNews">
+        <id column="id" property="id" ></id>
+        <result property="name" column="name"></result>
+        <result property="image" column="image"></result>
+        <result property="url" column="url"></result>
+        <result property="createTime" column="create_time"></result>
+    </resultMap>
+
+    <select id="getList" resultMap="SceneNews">
+        SELECT
+          *
+        FROM
+          lb_news
+        WHERE
+          deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getListByDate" resultMap="SceneNews">
+        SELECT
+          *
+        FROM
+          lb_news
+        WHERE
+          deleted = 0
+        AND
+          create_time
+            BETWEEN
+            #{date}
+            AND
+            DATE_ADD(#{date},INTERVAL 1 DAY)
+    </select>
+
+    <update id="updateTime">
+        update
+          lb_news
+        SET
+          create_time = #{date}
+        WHERE
+          id = #{id}
+    </update>
+
+    <update id="update">
+        update
+        lb_news
+        SET
+        image = #{image}
+        WHERE
+        id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.scene.dao.SceneImageDao" >
+
+    <resultMap id="SceneImage" type="cn.zpc.mvc.scene.entity.SceneImage">
+        <id column="id" property="id" ></id>
+        <result property="imageName" column="image_name"></result>
+        <result property="userId" column="user_id"></result>
+        <result property="sceneId" column="scene_id"></result>
+        <result property="weight" column="weight"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="deleted" column="deleted"></result>
+    </resultMap>
+
+    <select id="getManage" resultMap="SceneImage">
+        SELECT *
+        FROM
+          lb_scene_image
+        WHERE
+          user_id = #{userId}
+        AND
+          scene_id = #{sceneId}
+        AND
+          image_name = #{imageName}
+          AND deleted = 0
+    </select>
+
+    <select id="getImages" resultMap="SceneImage">
+        SELECT *
+        FROM
+          lb_scene_image
+        WHERE
+          scene_id = #{sceneId}
+          AND
+          deleted = 0
+          ORDER BY weight DESC
+    </select>
+
+    <select id="getImagesByUserId" resultMap="SceneImage">
+        SELECT *
+        FROM
+        lb_scene_image
+        WHERE
+        user_id = #{userId}
+        AND
+        deleted = 0
+        order  by  rand()
+        LIMIT 3
+    </select>
+
+    <select id="getMainImage" resultMap="SceneImage">
+        SELECT *
+        FROM
+        lb_scene_image
+        WHERE
+        scene_id = #{sceneId}
+        AND
+        deleted = 0
+        ORDER BY weight DESC
+        LIMIT 0,1
+    </select>
+
+    <update id="update">
+        UPDATE
+          lb_scene_image
+        SET
+          user_id = #{userId},
+          create_time = #{createTime},
+          <if test="deleted != null">
+              deleted = #{deleted}
+          </if>
+        WHERE
+          id = #{id}
+    </update>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT
+          lb_scene_image
+        (
+          image_name,
+          user_id,
+          scene_id,
+          create_time
+        )VALUES (
+          #{imageName},
+          #{userId},
+          #{sceneId},
+          #{createTime}
+        )
+    </insert>
+
+    <update id="clearSceneImages">
+        update
+          lb_scene_image
+        SET
+          weight = 0,
+          deleted = 1
+        WHERE
+          deleted = 0
+        and
+          scene_id = #{sceneId}
+    </update>
+
+
+    <insert id="insertSceneImage" useGeneratedKeys="true" keyProperty="id">
+        INSERT
+          lb_scene_image
+        (
+          image_name,
+          user_id,
+          scene_id,
+          weight,
+          create_time
+        )VALUES (
+          #{imageName},
+          #{userId},
+          #{sceneId},
+          #{weight},
+          #{createTime}
+        )
+    </insert>
+
+</mapper>

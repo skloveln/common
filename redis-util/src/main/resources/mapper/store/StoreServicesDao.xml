@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.store.dao.StoreServicesDao" >
+
+    <resultMap id="StoreServices" type="cn.zpc.mvc.store.entity.StoreServices">
+        <id property="id" column="id"></id>
+        <result property="storeId" column="store_id"></result>
+        <result property="eat" column="eat"></result>
+        <result property="stay" column="stay"></result>
+        <result property="trip" column="trip"></result>
+        <result property="desc" column="describe"></result>
+    </resultMap>
+
+    <select id="getByStoreId" resultMap="StoreServices">
+        SELECT
+          *
+        FROM
+          lb_store_with_service
+        WHERE
+          store_id = #{storeId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT
+          lb_store_with_service
+        (
+        <if test="eat != null">
+          eat,
+        </if>
+        <if test="stay != null">
+          stay,
+        </if>
+        <if test="trip != null">
+          trip,
+        </if>
+        <if test="desc != null">
+          describe,
+        </if>
+        store_id
+        )VALUES (
+        <if test="eat != null">
+            #{eat},
+        </if>
+        <if test="stay != null">
+            #{stay},
+        </if>
+        <if test="trip != null">
+            #{trip},
+        </if>
+        <if test="desc != null">
+            #{desc},
+        </if>
+          #{storeId}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE
+          lb_store_with_service
+        SET
+        <if test="eat != null">
+            eat = #{eat},
+        </if>
+        <if test="desc != null">
+            desc = #{desc},
+        </if>
+        <if test="stay != null">
+            stay = #{stay},
+        </if>
+        <if test="trip != null">
+            trip = #{trip},
+        </if>
+        <if test="storeId != null">
+            store_id = #{storeId}
+        </if>
+        WHERE
+          store_id = #{storeId}
+    </update>
+
+
+
+
+
+
+</mapper>

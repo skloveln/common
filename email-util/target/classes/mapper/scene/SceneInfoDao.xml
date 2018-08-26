@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.zpc.mvc.scene.dao.SceneInfoDao" >
+
+    <resultMap id="SceneInfo" type="cn.zpc.mvc.scene.entity.SceneInfo">
+        <id column="id" property="id" ></id>
+        <result property="sceneName" column="scene_name"></result>
+        <result property="sceneTypeId" column="scene_type_id"></result>
+        <result property="sceneKeyword" column="scene_keyword"></result>
+        <result property="sceneArea" column="scene_area"></result>
+        <result property="scenePrice" column="price"></result>
+        <result property="scenePriceType" column="price_type"></result>
+        <result property="sceneDesc" column="scene_desc"></result>
+        <result property="province" column="province"></result>
+        <result property="city" column="city"></result>
+        <result property="sceneAddress" column="scene_address"></result>
+        <result property="lat" column="lat"></result>
+        <result property="lon" column="lon"></result>
+        <result property="status" column="status"></result>
+        <result property="vrUrl" column="vr_url"></result>
+        <result property="hot" column="hot"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+        <result property="length" column="length"></result>
+        <result property="width" column="width"></result>
+        <result property="height" column="height"></result>
+        <result property="deleted" column="deleted"></result>
+        <result property="cause" column="cause"></result>
+        <result property="weight" column="weight"></result>
+    </resultMap>
+
+    <select id="get" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          id = #{id}
+          AND
+          status = 1
+          AND
+          deleted = 0
+    </select>
+
+    <select id="manageGet" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          id = #{id}
+    </select>
+
+    <select id="getManage" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          id = #{id}
+          AND
+          user_id = #{userId}
+    </select>
+
+    <update id="update">
+        UPDATE
+          lb_scene_info
+        SET
+          <if test="sceneName != null">
+              scene_name = #{sceneName},
+          </if>
+          <if test="sceneTypeId != null">
+              scene_type_id = #{sceneTypeId},
+          </if>
+          <if test="sceneKeyword != null">
+              scene_keyword = #{sceneKeyword},
+          </if>
+          <if test="sceneArea != null">
+              scene_area = #{sceneArea},
+          </if>
+          <if test="sceneDesc != null">
+              scene_desc = #{sceneDesc},
+          </if>
+          <if test="province != null">
+              province = #{province},
+          </if>
+          <if test="city != null">
+              city = #{city},
+          </if>
+          <if test="length != null">
+              length = #{length},
+          </if>
+          <if test="width != null">
+              width = #{width},
+          </if>
+          <if test="height != null">
+              height = #{height},
+          </if>
+          <if test="sceneAddress != null">
+              scene_address = #{sceneAddress},
+          </if>
+          <if test="lat != null">
+              lat = #{lat},
+          </if>
+          <if test="lon != null">
+              lon = #{lon},
+          </if>
+          <if test="status != null">
+              status = #{status},
+          </if>
+          <if test="scenePrice != null">
+              price = #{scenePrice},
+          </if>
+          <if test="scenePriceType != null">
+              price_type = #{scenePriceType},
+          </if>
+          <if test="deleted != null">
+              deleted = #{deleted},
+          </if>
+          <if test="weight != null">
+              weight = #{weight},
+          </if>
+          <if test="hot != null">
+              hot = #{hot},
+          </if>
+          <if test="updateTime != null">
+              update_time = #{updateTime},
+          </if>
+              user_id = #{userId}
+        WHERE
+          user_id = #{userId}
+        AND
+          id = #{id}
+    </update>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT
+          lb_scene_info
+        (
+        <if test="sceneName != null">
+            scene_name,
+        </if>
+        <if test="sceneTypeId != null">
+            scene_type_id,
+        </if>
+        <if test="sceneKeyword != null">
+            scene_keyword,
+        </if>
+        <if test="sceneArea != null">
+            scene_area,
+        </if>
+        <if test="sceneDesc != null">
+            scene_desc,
+        </if>
+        <if test="province != null">
+            province,
+        </if>
+        <if test="city != null">
+            city,
+        </if>
+        <if test="length != null">
+            length,
+        </if>
+        <if test="width != null">
+            width,
+        </if>
+        <if test="height != null">
+            height,
+        </if>
+        <if test="sceneAddress != null">
+            scene_address,
+        </if>
+        <if test="lat != null">
+            lat,
+        </if>
+        <if test="lon != null">
+            lon,
+        </if>
+        <if test="status != null">
+            status,
+        </if>
+        <if test="scenePrice != null">
+            price,
+        </if>
+        <if test="scenePriceType != null">
+            price_type,
+        </if>
+            user_id,
+            create_time
+        ) VALUES (
+        <if test="sceneName != null">
+            #{sceneName},
+        </if>
+        <if test="sceneTypeId != null">
+            #{sceneTypeId},
+        </if>
+        <if test="sceneKeyword != null">
+            #{sceneKeyword},
+        </if>
+        <if test="sceneArea != null">
+            #{sceneArea},
+        </if>
+        <if test="sceneDesc != null">
+            #{sceneDesc},
+        </if>
+        <if test="province != null">
+            #{province},
+        </if>
+        <if test="city != null">
+            #{city},
+        </if>
+        <if test="length != null">
+            #{length},
+        </if>
+        <if test="width != null">
+            #{width},
+        </if>
+        <if test="height != null">
+            #{height},
+        </if>
+        <if test="sceneAddress != null">
+            #{sceneAddress},
+        </if>
+        <if test="lat != null">
+            #{lat},
+        </if>
+        <if test="lon != null">
+            #{lon},
+        </if>
+        <if test="status != null">
+            #{status},
+        </if>
+        <if test="scenePrice != null">
+            #{scenePrice},
+        </if>
+        <if test="scenePriceType != null">
+            #{scenePriceType},
+        </if>
+        #{userId},
+        #{createTime}
+        )
+    </insert>
+
+
+    <select id="getVrListByUser" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          user_id = #{userId}
+          AND
+          status = 1
+          AND
+          deleted = 0
+          AND
+          vr_url IS NOT NULL
+          ORDER BY hot DESC
+    </select>
+
+    <select id="getVrList" resultMap="SceneInfo">
+        SELECT *
+        FROM
+        lb_scene_info
+        WHERE
+        status = 1
+        AND
+        deleted = 0
+        AND
+        vr_url IS NOT NULL
+        ORDER BY hot DESC
+    </select>
+
+    <select id="getListByUser" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          user_id = #{userId}
+        AND
+          status = #{status}
+        AND
+          deleted = 0
+        ORDER BY weight DESC
+    </select>
+
+    <select id="getListByType" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          scene_type_id IN
+        <foreach item="item" index="index" collection="typeId" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND
+          status = 1
+        AND
+          deleted = 0
+        ORDER BY hot DESC
+    </select>
+
+    <select id="getHotScene" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          status = 1
+        AND
+          deleted = 0
+        ORDER BY hot DESC
+    </select>
+
+    <select id="getListByTime" resultMap="SceneInfo">
+        SELECT *
+        FROM
+        lb_scene_info
+        WHERE
+        status = 1
+        AND
+        deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+
+    <select id="search" resultMap="SceneInfo">
+        SELECT t1.*
+        FROM
+          lb_scene_info t1 LEFT JOIN lb_scene_type t2
+          ON t1.scene_type_id = t2.id
+        WHERE
+          t1.deleted = 0
+        AND
+          t1.status = 1
+        <if test="keyword != null and keyword != ''">
+        AND
+          concat(t1.scene_name,t2.scene_type_name,t1.scene_keyword,t1.scene_area,t1.scene_address,t1.price,t1.price_type)
+        LIKE
+          concat('%',#{keyword},'%')
+        </if>
+        <if test="address != null and address != ''">
+        AND
+            t1.scene_address LIKE concat('%',#{address},'%')
+        </if>
+        <if test="type != null and type.size > 0">
+        AND
+            t1.scene_type_id
+            IN
+            <foreach item="item" index="index" collection="type" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="priceType!=null and priceType!=0">
+        AND
+            t1.price_type = #{priceType}
+        </if>
+        <if test="priceMin!=null">
+        AND
+            t1.price BETWEEN #{priceMin} AND #{priceMax}
+        </if>
+        <if test="areaMin!=null">
+        AND
+            t1.scene_area BETWEEN #{areaMin} AND #{areaMax}
+        </if>
+        ORDER BY t1.hot DESC
+    </select>
+
+
+    <update id="clearWeight">
+        update
+          lb_scene_info
+        SET
+          weight = 0
+        WHERE
+          `status` = 1
+        and
+          deleted = 0
+        and
+          user_id = #{userId}
+    </update>
+
+
+    <select id="getNewSceneGroupUser" resultMap="SceneInfo">
+        SELECT
+        t1.*
+        FROM
+        lb_scene_info t1, lb_store t2
+        WHERE
+        t1.user_id = t2.user_id
+        AND
+        t2.status = 0
+        AND
+        t1.status = 1
+        AND
+        t1.deleted = 0
+         GROUP BY t1.user_id
+         ORDER BY t1.update_time desc
+    </select>
+
+    <delete id="delete">
+        DELETE
+        FROM
+          lb_scene_info
+        WHERE
+          id = #{id}
+    </delete>
+
+    <delete id="deleteScene">
+        UPDATE
+        lb_scene_info
+        SET
+        deleted = 1
+        WHERE
+        user_id = #{userId}
+    </delete>
+
+    <select id="getRecommendScene" resultType="Integer">
+        SELECT
+          scene_id
+        FROM
+          lb_scene_recommend
+        WHERE
+          deleted = 0
+        ORDER BY weight DESC
+    </select>
+
+
+    <resultMap id="SearchResult" type="cn.zpc.mvc.sys.entity.SearchResult">
+        <id column="id" property="id"></id>
+        <result column="type" property="type"></result>
+    </resultMap>
+
+
+    <select id="getSceneTab" resultMap="SearchResult">
+        SELECT
+          update_time as time,
+          id,
+          1 as type
+        FROM
+          lb_scene_info
+        WHERE
+          deleted = 0
+        AND
+          status = 1
+        UNION
+        (
+        SELECT
+          create_time,
+          id,
+          2 as type
+        FROM
+          lb_album
+        WHERE
+          deleted = 0
+        AND
+        (
+        <if test="userId != null">
+            user_id = #{userId}
+            AND
+        </if>
+          status = 0
+        OR
+          status = 1
+        )
+        )
+        ORDER BY time desc
+    </select>
+    
+    <resultMap id="SceneMap" type="cn.zpc.mvc.scene.entity.SceneMap">
+        <id column="id" property="id"></id>
+        <result column="type" property="type"></result>
+        <result column="lon" property="lon"></result>
+        <result column="lat" property="lat"></result>
+    </resultMap>
+
+    <select id="getSceneMap" resultMap="SceneMap">
+        SELECT
+        id,
+        1 as type,
+        lat,
+        lon
+        FROM
+        lb_scene_info
+        WHERE
+        deleted = 0
+        AND
+        status = 1
+        AND
+        lat BETWEEN #{bottomLat} AND #{topLat}
+        AND
+        lon BETWEEN #{topLon} AND #{bottomLon}
+        UNION
+        (
+          SELECT
+          id,
+          2 as type,
+          lat,
+          lon
+          FROM
+          lb_album
+          WHERE
+          deleted = 0
+          AND
+          status = 1
+          AND
+          lat BETWEEN #{bottomLat} AND #{topLat}
+          AND
+          lon BETWEEN #{topLon} AND #{bottomLon}
+        )
+        Limit 30
+    </select>
+
+    <select id="getNearestScene" resultMap="SceneMap">
+      SELECT
+      id,
+      1 as type,
+      lat,
+      lon
+      FROM
+      lb_scene_info
+      WHERE
+      deleted=0
+      AND
+      `status`=1
+      AND
+      lat IS NOT NULL
+      AND
+      lon IS NOT NULL
+      UNION
+      (
+      SELECT
+      id,
+      2 as type,
+      lat,
+      lon
+      FROM
+      lb_album
+      WHERE
+      deleted = 0
+      AND
+      `status` = 1
+      AND
+      lat IS NOT NULL
+      AND
+      lon IS NOT NULL
+      )
+      ORDER BY
+      POWER(ABS(lat - #{lat}), 2)+ POWER(ABS(lon - #{lon}), 2)
+      ASC
+    </select>
+
+    <select id="getLonLatScene" resultMap="SceneMap">
+        SELECT
+        id,
+        1 as type,
+        lat,
+        lon
+        FROM
+        lb_scene_info
+        WHERE
+        deleted=0
+        AND
+        `status`=1
+        AND
+        lat like concat(#{lat}, '%')
+        AND
+        lon like concat(#{lon}, '%')
+        UNION
+        (
+        SELECT
+        id,
+        2 as type,
+        lat,
+        lon
+        FROM
+        lb_album
+        WHERE
+        deleted = 0
+        AND
+        `status` = 1
+        AND
+        lat like concat(#{lat}, '%')
+        AND
+        lon like concat(#{lon}, '%')
+        )
+    </select>
+
+    <select id="countScene" resultType="Integer">
+        SELECT
+          count(*)
+        FROM
+        lb_scene_info
+        WHERE
+          status = 1
+        <if test="userId != null">
+           and  user_id = #{userId}
+        </if>
+        AND
+          deleted = 0
+    </select>
+
+    <select id="selectCity" resultType="String">
+        SELECT DISTINCT city FROM lb_scene_info WHERE `status`=1 AND deleted=0 AND
+         city IS NOT NULL AND city != '' AND province !="北京市" AND province !="上海市" AND province !="重庆市" AND province !="天津市" AND province !="香港" GROUP BY city
+        UNION
+        (SELECT city FROM lb_album WHERE `status`=1 AND deleted=0 AND city IS NOT NULL AND city != '' AND province !="北京市" AND province !="上海市" AND province !="重庆市" AND province !="天津市" AND province !="香港" GROUP BY city)
+    </select>
+
+    <select id="getSceneList" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          status = 1
+        AND
+        user_id = #{userId}
+        and
+          deleted = 0
+        ORDER BY weight DESC
+    </select>
+
+    <select id="getSceneHomeList" resultMap="SceneInfo">
+        SELECT *
+        FROM
+          lb_scene_info
+        WHERE
+          status = 1
+        and
+          deleted = 0
+        ORDER BY weight DESC,hot desc
+    </select>
+
+    <select id="getSceneNameById" resultType="String" >
+        SELECT scene_name
+        FROM
+          lb_scene_info
+        WHERE
+          id = #{id}
+          AND
+          deleted = 0
+    </select>
+
+
+</mapper>

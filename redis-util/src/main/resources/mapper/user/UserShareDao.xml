@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zpc.mvc.user.dao.UserShareDao" >
+
+  <resultMap id="UserShare" type="cn.zpc.mvc.user.entity.UserShare">
+    <id property="id" column="id"></id>
+    <result property="targetId" column="target_id"></result>
+    <result property="targetType" column="target_type"></result>
+    <result property="userId" column="user_id"></result>
+    <result property="count" column="count"></result>
+  </resultMap>
+
+
+  <select id="getByTarget" resultMap="UserShare">
+    SELECT * FROM
+      lb_user_share_log
+    WHERE
+      target_id = #{targetId}
+      AND
+      target_type = #{targetType}
+      AND
+      user_id = #{userId}
+  </select>
+
+  <insert id="insert">
+    INSERT INTO
+      lb_user_share_log(
+        user_id,
+        target_type,
+        target_id,
+        count
+      )
+    VALUES(
+      #{userId},
+      #{targetType},
+      #{targetId},
+      #{count}
+    )
+  </insert>
+
+  <update id="update">
+    UPDATE
+      lb_user_share_log
+    SET
+    <if test="userId != null" >
+      user_id = #{userId},
+    </if>
+    <if test="targetType != null">
+      target_type = #{targetType},
+    </if>
+    <if test="targetId != null">
+      target_id = #{targetId},
+    </if>
+    <if test="userId != null">
+      user_id = #{userId},
+    </if>
+    <if test="count != null">
+      count = #{count}
+    </if>
+    WHERE
+      id = #{id}
+  </update>
+
+</mapper>
