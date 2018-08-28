@@ -1,6 +1,5 @@
 package com.github.sky.serializer;
 
-import com.github.sky.utils.LogUtils;
 import redis.clients.util.SafeEncoder;
 
 import java.io.ByteArrayInputStream;
@@ -41,19 +40,20 @@ public class JdkSerializer implements ISerializer {
             objectOut.writeObject(value);
             objectOut.flush();
             return bytesOut.toByteArray();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-        finally {
-            if(objectOut != null)
-                try {objectOut.close();} catch (Exception e) {
-                    LogUtils.error(e.getMessage(), e);}
+        } finally {
+            if (objectOut != null)
+                try {
+                    objectOut.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         }
     }
 
     public Object valueFromBytes(byte[] bytes) {
-        if(bytes == null || bytes.length == 0)
+        if (bytes == null || bytes.length == 0)
             return null;
 
         ObjectInputStream objectInput = null;
@@ -61,14 +61,15 @@ public class JdkSerializer implements ISerializer {
             ByteArrayInputStream bytesInput = new ByteArrayInputStream(bytes);
             objectInput = new ObjectInputStream(bytesInput);
             return objectInput.readObject();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             if (objectInput != null)
-                try {objectInput.close();} catch (Exception e) {
-                    LogUtils.error(e.getMessage(), e);}
+                try {
+                    objectInput.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         }
     }
 }
