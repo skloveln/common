@@ -13,64 +13,66 @@ import java.util.*;
  */
 public class RedisUtil {
 
-    protected static ISerializer serializer = FstSerializer.fstSerializer;
-    protected static IKeyNamingPolicy keyNamingPolicy = IKeyNamingPolicy.defaultKeyNamingPolicy;
+    // 序列化方式
+    private static ISerializer serializer = FstSerializer.fstSerializer;
+    // key的命名策略
+    private static IKeyNamingPolicy keyNamingPolicy = IKeyNamingPolicy.defaultKeyNamingPolicy;
 
-    protected static byte[] keyToBytes(Object key) {
+    private static byte[] keyToBytes(Object key) {
         String keyStr = keyNamingPolicy.getKeyName(key);
         return serializer.keyToBytes(keyStr);
     }
 
-    protected static byte[][] keysToBytesArray(Object... keys) {
+    private static byte[][] keysToBytesArray(Object... keys) {
         byte[][] result = new byte[keys.length][];
         for (int i=0; i<result.length; i++)
             result[i] = keyToBytes(keys[i]);
         return result;
     }
 
-    protected static byte[] fieldToBytes(Object field) {
+    private static byte[] fieldToBytes(Object field) {
         return serializer.fieldToBytes(field);
     }
 
-    protected static Object fieldFromBytes(byte[] bytes) {
+    private static Object fieldFromBytes(byte[] bytes) {
         return serializer.fieldFromBytes(bytes);
     }
 
-    protected static byte[][] fieldsToBytesArray(Object... fieldsArray) {
+    private static byte[][] fieldsToBytesArray(Object... fieldsArray) {
         byte[][] data = new byte[fieldsArray.length][];
         for (int i=0; i<data.length; i++)
             data[i] = fieldToBytes(fieldsArray[i]);
         return data;
     }
 
-    protected static void fieldSetFromBytesSet(Set<byte[]> data, Set<Object> result) {
+    private static void fieldSetFromBytesSet(Set<byte[]> data, Set<Object> result) {
         for (byte[] fieldBytes : data) {
             result.add(fieldFromBytes(fieldBytes));
         }
     }
 
-    protected static byte[] valueToBytes(Object value) {
+    private static byte[] valueToBytes(Object value) {
         return serializer.valueToBytes(value);
     }
 
-    protected static Object valueFromBytes(byte[] bytes) {
+    private static Object valueFromBytes(byte[] bytes) {
         return serializer.valueFromBytes(bytes);
     }
 
-    protected static byte[][] valuesToBytesArray(Object... valuesArray) {
+    private static byte[][] valuesToBytesArray(Object... valuesArray) {
         byte[][] data = new byte[valuesArray.length][];
         for (int i=0; i<data.length; i++)
             data[i] = valueToBytes(valuesArray[i]);
         return data;
     }
 
-    protected static void valueSetFromBytesSet(Set<byte[]> data, Set<Object> result) {
+    private static void valueSetFromBytesSet(Set<byte[]> data, Set<Object> result) {
         for (byte[] valueBytes : data) {
             result.add(valueFromBytes(valueBytes));
         }
     }
 
-    protected static List valueListFromBytesList(List<byte[]> data) {
+    private static List valueListFromBytesList(List<byte[]> data) {
         List<Object> result = new ArrayList<Object>();
         for (byte[] d : data)
             result.add(valueFromBytes(d));
@@ -78,7 +80,7 @@ public class RedisUtil {
     }
 
     private static Jedis getJedis() {
-        CustomPool customPool = RedisExecutor.getCustomPool();
+        CustomPool customPool = RedisPoolHolder.getCustomPool();
         return customPool.getResource();
     }
 
@@ -179,7 +181,7 @@ public class RedisUtil {
      * List list = cache.mget("k1", "k2");		// 利用多个键值得到上面代码放入的值
      * </pre>
      */
-    public String mset(Object... keysValues) {
+    public static String mset(Object... keysValues) {
         if (keysValues.length % 2 != 0)
             throw new IllegalArgumentException("wrong number of arguments for met, keysValues length can not be odd");
         Jedis jedis = getJedis();
@@ -201,7 +203,7 @@ public class RedisUtil {
      * 如果给定的 key 里面，有某个 key 不存在，那么这个 key 返回特殊值 nil 。因此，该命令永不失败。
      */
     @SuppressWarnings("rawtypes")
-    public List mget(Object... keys) {
+    public static List mget(Object... keys) {
         Jedis jedis = getJedis();
         try {
             byte[][] keysBytesArray = keysToBytesArray(keys);
@@ -218,7 +220,7 @@ public class RedisUtil {
      * 本操作的值限制在 64 位(bit)有符号数字表示之内。
      * 关于递增(increment) / 递减(decrement)操作的更多信息，请参见 INCR 命令。
      */
-    public Long decr(Object key) {
+    public static Long decr(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.decr(keyToBytes(key));
@@ -233,7 +235,7 @@ public class RedisUtil {
      * 本操作的值限制在 64 位(bit)有符号数字表示之内。
      * 关于更多递增(increment) / 递减(decrement)操作的更多信息，请参见 INCR 命令。
      */
-    public Long decrBy(Object key, long longValue) {
+    public static Long decrBy(Object key, long longValue) {
         Jedis jedis = getJedis();
         try {
             return jedis.decrBy(keyToBytes(key), longValue);
@@ -247,7 +249,7 @@ public class RedisUtil {
      * 如果值包含错误的类型，或字符串类型的值不能表示为数字，那么返回一个错误。
      * 本操作的值限制在 64 位(bit)有符号数字表示之内。
      */
-    public Long incr(Object key) {
+    public static Long incr(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.incr(keyToBytes(key));
@@ -262,7 +264,7 @@ public class RedisUtil {
      * 本操作的值限制在 64 位(bit)有符号数字表示之内。
      * 关于递增(increment) / 递减(decrement)操作的更多信息，参见 INCR 命令。
      */
-    public Long incrBy(Object key, long longValue) {
+    public static Long incrBy(Object key, long longValue) {
         Jedis jedis = getJedis();
         try {
             return jedis.incrBy(keyToBytes(key), longValue);
@@ -273,7 +275,7 @@ public class RedisUtil {
     /**
      * 检查给定 key 是否存在。
      */
-    public boolean exists(Object key) {
+    public static boolean exists(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.exists(keyToBytes(key));
@@ -284,7 +286,7 @@ public class RedisUtil {
     /**
      * 从当前数据库中随机返回(不删除)一个 key 。
      */
-    public String randomKey() {
+    public static String randomKey() {
         Jedis jedis = getJedis();
         try {
             return jedis.randomKey();
@@ -297,7 +299,7 @@ public class RedisUtil {
      * 当 key 和 newkey 相同，或者 key 不存在时，返回一个错误。
      * 当 newkey 已经存在时， RENAME 命令将覆盖旧值。
      */
-    public String rename(Object oldkey, Object newkey) {
+    public static String rename(Object oldkey, Object newkey) {
         Jedis jedis = getJedis();
         try {
             return jedis.rename(keyToBytes(oldkey), keyToBytes(newkey));
@@ -310,7 +312,7 @@ public class RedisUtil {
      * 如果当前数据库(源数据库)和给定数据库(目标数据库)有相同名字的给定 key ，或者 key 不存在于当前数据库，那么 MOVE 没有任何效果。
      * 因此，也可以利用这一特性，将 MOVE 当作锁(locking)原语(primitive)。
      */
-    public Long move(Object key, int dbIndex) {
+    public static Long move(Object key, int dbIndex) {
         Jedis jedis = getJedis();
         try {
             return jedis.move(keyToBytes(key), dbIndex);
@@ -321,7 +323,7 @@ public class RedisUtil {
     /**
      * 将 key 原子性地从当前实例传送到目标实例的指定数据库上，一旦传送成功， key 保证会出现在目标实例上，而当前实例上的 key 会被删除。
      */
-    public String migrate(String host, int port, Object key, int destinationDb, int timeout) {
+    public static String migrate(String host, int port, Object key, int destinationDb, int timeout) {
         Jedis jedis = getJedis();
         try {
             return jedis.migrate(valueToBytes(host), port, keyToBytes(key), destinationDb, timeout);
@@ -338,7 +340,7 @@ public class RedisUtil {
      * 2：使用 Redis.call(ICallback) 进行操作
      * 3：自行获取 Jedis 对象进行操作
      */
-    public String select(int databaseIndex) {
+    public static String select(int databaseIndex) {
         Jedis jedis = getJedis();
         try {
             return jedis.select(databaseIndex);
@@ -350,7 +352,7 @@ public class RedisUtil {
      * 为给定 key 设置生存时间，当 key 过期时(生存时间为 0 )，它会被自动删除。
      * 在 Redis 中，带有生存时间的 key 被称为『易失的』(volatile)。
      */
-    public Long expire(Object key, int seconds) {
+    public static Long expire(Object key, int seconds) {
         Jedis jedis = getJedis();
         try {
             return jedis.expire(keyToBytes(key), seconds);
@@ -361,7 +363,7 @@ public class RedisUtil {
     /**
      * EXPIREAT 的作用和 EXPIRE 类似，都用于为 key 设置生存时间。不同在于 EXPIREAT 命令接受的时间参数是 UNIX 时间戳(unix timestamp)。
      */
-    public Long expireAt(Object key, long unixTime) {
+    public static Long expireAt(Object key, long unixTime) {
         Jedis jedis = getJedis();
         try {
             return jedis.expireAt(keyToBytes(key), unixTime);
@@ -372,7 +374,7 @@ public class RedisUtil {
     /**
      * 这个命令和 EXPIRE 命令的作用类似，但是它以毫秒为单位设置 key 的生存时间，而不像 EXPIRE 命令那样，以秒为单位。
      */
-    public Long pexpire(Object key, long milliseconds) {
+    public static Long pexpire(Object key, long milliseconds) {
         Jedis jedis = getJedis();
         try {
             return jedis.pexpire(keyToBytes(key), milliseconds);
@@ -383,7 +385,7 @@ public class RedisUtil {
     /**
      * 这个命令和 EXPIREAT 命令类似，但它以毫秒为单位设置 key 的过期 unix 时间戳，而不是像 EXPIREAT 那样，以秒为单位。
      */
-    public Long pexpireAt(Object key, long millisecondsTimestamp) {
+    public static Long pexpireAt(Object key, long millisecondsTimestamp) {
         Jedis jedis = getJedis();
         try {
             return jedis.pexpireAt(keyToBytes(key), millisecondsTimestamp);
@@ -396,7 +398,7 @@ public class RedisUtil {
      * 当 key 存在但不是字符串类型时，返回一个错误。
      */
     @SuppressWarnings("unchecked")
-    public <T> T getSet(Object key, Object value) {
+    public static <T> T getSet(Object key, Object value) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.getSet(keyToBytes(key), valueToBytes(value)));
@@ -407,7 +409,7 @@ public class RedisUtil {
     /**
      * 移除给定 key 的生存时间，将这个 key 从『易失的』(带生存时间 key )转换成『持久的』(一个不带生存时间、永不过期的 key )。
      */
-    public Long persist(Object key) {
+    public static Long persist(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.persist(keyToBytes(key));
@@ -418,7 +420,7 @@ public class RedisUtil {
     /**
      * 返回 key 所储存的值的类型。
      */
-    public String type(Object key) {
+    public static String type(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.type(keyToBytes(key));
@@ -429,7 +431,7 @@ public class RedisUtil {
     /**
      * 以秒为单位，返回给定 key 的剩余生存时间(TTL, time to live)。
      */
-    public Long ttl(Object key) {
+    public static Long ttl(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.ttl(keyToBytes(key));
@@ -440,7 +442,7 @@ public class RedisUtil {
     /**
      * 这个命令类似于 TTL 命令，但它以毫秒为单位返回 key 的剩余生存时间，而不是像 TTL 命令那样，以秒为单位。
      */
-    public Long pttl(Object key) {
+    public static Long pttl(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.pttl(keyToBytes(key));
@@ -451,7 +453,7 @@ public class RedisUtil {
     /**
      * 对象被引用的数量
      */
-    public Long objectRefcount(Object key) {
+    public static Long objectRefcount(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.objectRefcount(keyToBytes(key));
@@ -462,7 +464,7 @@ public class RedisUtil {
     /**
      * 对象没有被访问的空闲时间
      */
-    public Long objectIdletime(Object key) {
+    public static Long objectIdletime(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.objectIdletime(keyToBytes(key));
@@ -475,7 +477,7 @@ public class RedisUtil {
      * 如果 key 不存在，一个新的哈希表被创建并进行 HSET 操作。
      * 如果域 field 已经存在于哈希表中，旧值将被覆盖。
      */
-    public Long hset(Object key, Object field, Object value) {
+    public static Long hset(Object key, Object field, Object value) {
         Jedis jedis = getJedis();
         try {
             return jedis.hset(keyToBytes(key), fieldToBytes(field), valueToBytes(value));
@@ -488,7 +490,7 @@ public class RedisUtil {
      * 此命令会覆盖哈希表中已存在的域。
      * 如果 key 不存在，一个空哈希表被创建并执行 HMSET 操作。
      */
-    public String hmset(Object key, Map<Object, Object> hash) {
+    public static String hmset(Object key, Map<Object, Object> hash) {
         Jedis jedis = getJedis();
         try {
             Map<byte[], byte[]> para = new HashMap<byte[], byte[]>();
@@ -503,7 +505,7 @@ public class RedisUtil {
      * 返回哈希表 key 中给定域 field 的值。
      */
     @SuppressWarnings("unchecked")
-    public <T> T hget(Object key, Object field) {
+    public static <T> T hget(Object key, Object field) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.hget(keyToBytes(key), fieldToBytes(field)));
@@ -517,7 +519,7 @@ public class RedisUtil {
      * 因为不存在的 key 被当作一个空哈希表来处理，所以对一个不存在的 key 进行 HMGET 操作将返回一个只带有 nil 值的表。
      */
     @SuppressWarnings("rawtypes")
-    public List hmget(Object key, Object... fields) {
+    public static List hmget(Object key, Object... fields) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.hmget(keyToBytes(key), fieldsToBytesArray(fields));
@@ -529,7 +531,7 @@ public class RedisUtil {
     /**
      * 删除哈希表 key 中的一个或多个指定域，不存在的域将被忽略。
      */
-    public Long hdel(Object key, Object... fields) {
+    public static Long hdel(Object key, Object... fields) {
         Jedis jedis = getJedis();
         try {
             return jedis.hdel(keyToBytes(key), fieldsToBytesArray(fields));
@@ -540,7 +542,7 @@ public class RedisUtil {
     /**
      * 查看哈希表 key 中，给定域 field 是否存在。
      */
-    public boolean hexists(Object key, Object field) {
+    public static boolean hexists(Object key, Object field) {
         Jedis jedis = getJedis();
         try {
             return jedis.hexists(keyToBytes(key), fieldToBytes(field));
@@ -553,7 +555,7 @@ public class RedisUtil {
      * 在返回值里，紧跟每个域名(field name)之后是域的值(value)，所以返回值的长度是哈希表大小的两倍。
      */
     @SuppressWarnings("rawtypes")
-    public Map hgetAll(Object key) {
+    public static Map hgetAll(Object key) {
         Jedis jedis = getJedis();
         try {
             Map<byte[], byte[]> data = jedis.hgetAll(keyToBytes(key));
@@ -569,7 +571,7 @@ public class RedisUtil {
      * 返回哈希表 key 中所有域的值。
      */
     @SuppressWarnings("rawtypes")
-    public List hvals(Object key) {
+    public static List hvals(Object key) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.hvals(keyToBytes(key));
@@ -582,7 +584,7 @@ public class RedisUtil {
      * 返回哈希表 key 中的所有域。
      * 底层实现此方法取名为 hfields 更为合适，在此仅为与底层保持一致
      */
-    public Set<Object> hkeys(Object key) {
+    public static Set<Object> hkeys(Object key) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> fieldSet = jedis.hkeys(keyToBytes(key));
@@ -596,7 +598,7 @@ public class RedisUtil {
     /**
      * 返回哈希表 key 中域的数量。
      */
-    public Long hlen(Object key) {
+    public static Long hlen(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.hlen(keyToBytes(key));
@@ -612,7 +614,7 @@ public class RedisUtil {
      * 对一个储存字符串值的域 field 执行 HINCRBY 命令将造成一个错误。
      * 本操作的值被限制在 64 位(bit)有符号数字表示之内。
      */
-    public Long hincrBy(Object key, Object field, long value) {
+    public static Long hincrBy(Object key, Object field, long value) {
         Jedis jedis = getJedis();
         try {
             return jedis.hincrBy(keyToBytes(key), fieldToBytes(field), value);
@@ -629,7 +631,7 @@ public class RedisUtil {
      * 2:域 field 当前的值或给定的增量 increment 不能解释(parse)为双精度浮点数(double precision floating point number)
      * HINCRBYFLOAT 命令的详细功能和 INCRBYFLOAT 命令类似，请查看 INCRBYFLOAT 命令获取更多相关信息。
      */
-    public Double hincrByFloat(Object key, Object field, double value) {
+    public static Double hincrByFloat(Object key, Object field, double value) {
         Jedis jedis = getJedis();
         try {
             return jedis.hincrByFloat(keyToBytes(key), fieldToBytes(field), value);
@@ -644,15 +646,7 @@ public class RedisUtil {
      * 如果 key 不是列表类型，返回一个错误。
      */
     @SuppressWarnings("unchecked")
-
-    /**
-     * 返回列表 key 中，下标为 index 的元素。
-     * 下标(index)参数 start 和 stop 都以 0 为底，也就是说，以 0 表示列表的第一个元素，
-     * 以 1 表示列表的第二个元素，以此类推。
-     * 你也可以使用负数下标，以 -1 表示列表的最后一个元素， -2 表示列表的倒数第二个元素，以此类推。
-     * 如果 key 不是列表类型，返回一个错误。
-     */
-    public <T> T lindex(Object key, long index) {
+    public static <T> T lindex(Object key, long index) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.lindex(keyToBytes(key), index));
@@ -663,7 +657,7 @@ public class RedisUtil {
     /**
      * 获取记数器的值
      */
-    public Long getCounter(Object key) {
+    public static Long getCounter(Object key) {
         Jedis jedis = getJedis();
         try {
             return Long.parseLong((String)jedis.get(keyNamingPolicy.getKeyName(key)));
@@ -676,7 +670,7 @@ public class RedisUtil {
      * 如果 key 不存在，则 key 被解释为一个空列表，返回 0 .
      * 如果 key 不是列表类型，返回一个错误。
      */
-    public Long llen(Object key) {
+    public static Long llen(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.llen(keyToBytes(key));
@@ -688,7 +682,7 @@ public class RedisUtil {
      * 移除并返回列表 key 的头元素。
      */
     @SuppressWarnings("unchecked")
-    public <T> T lpop(Object key) {
+    public static <T> T lpop(Object key) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.lpop(keyToBytes(key)));
@@ -704,7 +698,7 @@ public class RedisUtil {
      * 如果 key 不存在，一个空列表会被创建并执行 LPUSH 操作。
      * 当 key 存在但不是列表类型时，返回一个错误。
      */
-    public Long lpush(Object key, Object... values) {
+    public static Long lpush(Object key, Object... values) {
         Jedis jedis = getJedis();
         try {
             return jedis.lpush(keyToBytes(key), valuesToBytesArray(values));
@@ -717,7 +711,7 @@ public class RedisUtil {
      * 当 index 参数超出范围，或对一个空列表( key 不存在)进行 LSET 时，返回一个错误。
      * 关于列表下标的更多信息，请参考 LINDEX 命令。
      */
-    public String lset(Object key, long index, Object value) {
+    public static String lset(Object key, long index, Object value) {
         Jedis jedis = getJedis();
         try {
             return jedis.lset(keyToBytes(key), index, valueToBytes(value));
@@ -732,7 +726,7 @@ public class RedisUtil {
      * count < 0 : 从表尾开始向表头搜索，移除与 value 相等的元素，数量为 count 的绝对值。
      * count = 0 : 移除表中所有与 value 相等的值。
      */
-    public Long lrem(Object key, long count, Object value) {
+    public static Long lrem(Object key, long count, Object value) {
         Jedis jedis = getJedis();
         try {
             return jedis.lrem(keyToBytes(key), count, valueToBytes(value));
@@ -751,7 +745,7 @@ public class RedisUtil {
      * </pre>
      */
     @SuppressWarnings("rawtypes")
-    public List lrange(Object key, long start, long end) {
+    public static List lrange(Object key, long start, long end) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.lrange(keyToBytes(key), start, end);
@@ -771,7 +765,7 @@ public class RedisUtil {
      * 你也可以使用负数下标，以 -1 表示列表的最后一个元素， -2 表示列表的倒数第二个元素，以此类推。
      * 当 key 不是列表类型时，返回一个错误。
      */
-    public String ltrim(Object key, long start, long end) {
+    public static String ltrim(Object key, long start, long end) {
         Jedis jedis = getJedis();
         try {
             return jedis.ltrim(keyToBytes(key), start, end);
@@ -783,7 +777,7 @@ public class RedisUtil {
      * 移除并返回列表 key 的尾元素。
      */
     @SuppressWarnings("unchecked")
-    public <T> T rpop(Object key) {
+    public static <T> T rpop(Object key) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.rpop(keyToBytes(key)));
@@ -797,7 +791,7 @@ public class RedisUtil {
      * 将 source 弹出的元素插入到列表 destination ，作为 destination 列表的的头元素。
      */
     @SuppressWarnings("unchecked")
-    public <T> T rpoplpush(Object srcKey, Object dstKey) {
+    public static <T> T rpoplpush(Object srcKey, Object dstKey) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.rpoplpush(keyToBytes(srcKey), keyToBytes(dstKey)));
@@ -813,7 +807,7 @@ public class RedisUtil {
      * 如果 key 不存在，一个空列表会被创建并执行 RPUSH 操作。
      * 当 key 存在但不是列表类型时，返回一个错误。
      */
-    public Long rpush(Object key, Object... values) {
+    public static Long rpush(Object key, Object... values) {
         Jedis jedis = getJedis();
         try {
             return jedis.rpush(keyToBytes(key), valuesToBytesArray(values));
@@ -827,7 +821,7 @@ public class RedisUtil {
      * 当给定多个 key 参数时，按参数 key 的先后顺序依次检查各个列表，弹出第一个非空列表的头元素。
      */
     @SuppressWarnings("rawtypes")
-    public List blpop(Object... keys) {
+    public static List blpop(Object... keys) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.blpop(keysToBytesArray(keys));
@@ -842,7 +836,7 @@ public class RedisUtil {
      * 当给定多个 key 参数时，按参数 key 的先后顺序依次检查各个列表，弹出第一个非空列表的头元素。
      */
     @SuppressWarnings("rawtypes")
-    public List blpop(int timeout, Object... keys) {
+    public static List blpop(int timeout, Object... keys) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.blpop(timeout, keysToBytesArray(keys));
@@ -858,7 +852,7 @@ public class RedisUtil {
      * 关于阻塞操作的更多信息，请查看 BLPOP 命令， BRPOP 除了弹出元素的位置和 BLPOP 不同之外，其他表现一致。
      */
     @SuppressWarnings("rawtypes")
-    public List brpop(Object... keys) {
+    public static List brpop(Object... keys) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.brpop(keysToBytesArray(keys));
@@ -874,7 +868,7 @@ public class RedisUtil {
      * 关于阻塞操作的更多信息，请查看 BLPOP 命令， BRPOP 除了弹出元素的位置和 BLPOP 不同之外，其他表现一致。
      */
     @SuppressWarnings("rawtypes")
-    public List brpop(int timeout, Object... keys) {
+    public static List brpop(int timeout, Object... keys) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.brpop(timeout, keysToBytesArray(keys));
@@ -887,7 +881,7 @@ public class RedisUtil {
      * 使用客户端向 Redis 服务器发送一个 PING ，如果服务器运作正常的话，会返回一个 PONG 。
      * 通常用于测试与服务器的连接是否仍然生效，或者用于测量延迟值。
      */
-    public String ping() {
+    public static String ping() {
         Jedis jedis = getJedis();
         try {
             return jedis.ping();
@@ -900,7 +894,7 @@ public class RedisUtil {
      * 假如 key 不存在，则创建一个只包含 member 元素作成员的集合。
      * 当 key 不是集合类型时，返回一个错误。
      */
-    public Long sadd(Object key, Object... members) {
+    public static Long sadd(Object key, Object... members) {
         Jedis jedis = getJedis();
         try {
             return jedis.sadd(keyToBytes(key), valuesToBytesArray(members));
@@ -911,7 +905,7 @@ public class RedisUtil {
     /**
      * 返回集合 key 的基数(集合中元素的数量)。
      */
-    public Long scard(Object key) {
+    public static Long scard(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.scard(keyToBytes(key));
@@ -924,7 +918,7 @@ public class RedisUtil {
      * 如果只想获取一个随机元素，但不想该元素从集合中被移除的话，可以使用 SRANDMEMBER 命令。
      */
     @SuppressWarnings("unchecked")
-    public <T> T spop(Object key) {
+    public static <T> T spop(Object key) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.spop(keyToBytes(key)));
@@ -937,7 +931,7 @@ public class RedisUtil {
      * 不存在的 key 被视为空集合。
      */
     @SuppressWarnings("rawtypes")
-    public Set smembers(Object key) {
+    public static Set smembers(Object key) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> data = jedis.smembers(keyToBytes(key));
@@ -951,7 +945,7 @@ public class RedisUtil {
     /**
      * 判断 member 元素是否集合 key 的成员。
      */
-    public boolean sismember(Object key, Object member) {
+    public static boolean sismember(Object key, Object member) {
         Jedis jedis = getJedis();
         try {
             return jedis.sismember(keyToBytes(key), valueToBytes(member));
@@ -963,7 +957,7 @@ public class RedisUtil {
      * 返回多个集合的交集，多个集合由 keys 指定
      */
     @SuppressWarnings("rawtypes")
-    public Set sinter(Object... keys) {
+    public static Set sinter(Object... keys) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> data = jedis.sinter(keysToBytesArray(keys));
@@ -978,7 +972,7 @@ public class RedisUtil {
      * 返回集合中的一个随机元素。
      */
     @SuppressWarnings("unchecked")
-    public <T> T srandmember(Object key) {
+    public static <T> T srandmember(Object key) {
         Jedis jedis = getJedis();
         try {
             return (T)valueFromBytes(jedis.srandmember(keyToBytes(key)));
@@ -995,7 +989,7 @@ public class RedisUtil {
      * 该操作和 SPOP 相似，但 SPOP 将随机元素从集合中移除并返回，而 SRANDMEMBER 则仅仅返回随机元素，而不对集合进行任何改动。
      */
     @SuppressWarnings("rawtypes")
-    public List srandmember(Object key, int count) {
+    public static List srandmember(Object key, int count) {
         Jedis jedis = getJedis();
         try {
             List<byte[]> data = jedis.srandmember(keyToBytes(key), count);
@@ -1007,7 +1001,7 @@ public class RedisUtil {
     /**
      * 移除集合 key 中的一个或多个 member 元素，不存在的 member 元素会被忽略。
      */
-    public Long srem(Object key, Object... members) {
+    public static Long srem(Object key, Object... members) {
         Jedis jedis = getJedis();
         try {
             return jedis.srem(keyToBytes(key), valuesToBytesArray(members));
@@ -1020,7 +1014,7 @@ public class RedisUtil {
      * 不存在的 key 被视为空集。
      */
     @SuppressWarnings("rawtypes")
-    public Set sunion(Object... keys) {
+    public static Set sunion(Object... keys) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> data = jedis.sunion(keysToBytesArray(keys));
@@ -1036,7 +1030,7 @@ public class RedisUtil {
      * 不存在的 key 被视为空集。
      */
     @SuppressWarnings("rawtypes")
-    public Set sdiff(Object... keys) {
+    public static Set sdiff(Object... keys) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> data = jedis.sdiff(keysToBytesArray(keys));
@@ -1052,7 +1046,7 @@ public class RedisUtil {
      * 如果某个 member 已经是有序集的成员，那么更新这个 member 的 score 值，
      * 并通过重新插入这个 member 元素，来保证该 member 在正确的位置上。
      */
-    public Long zadd(Object key, double score, Object member) {
+    public static Long zadd(Object key, double score, Object member) {
         Jedis jedis = getJedis();
         try {
             return jedis.zadd(keyToBytes(key), score, valueToBytes(member));
@@ -1060,7 +1054,7 @@ public class RedisUtil {
         finally {close(jedis);}
     }
 
-    public Long zadd(Object key, Map<Object, Double> scoreMembers) {
+    public static Long zadd(Object key, Map<Object, Double> scoreMembers) {
         Jedis jedis = getJedis();
         try {
             Map<byte[], Double> para = new HashMap<byte[], Double>();
@@ -1074,7 +1068,7 @@ public class RedisUtil {
     /**
      * 返回有序集 key 的基数。
      */
-    public Long zcard(Object key) {
+    public static Long zcard(Object key) {
         Jedis jedis = getJedis();
         try {
             return jedis.zcard(keyToBytes(key));
@@ -1086,7 +1080,7 @@ public class RedisUtil {
      * 返回有序集 key 中， score 值在 min 和 max 之间(默认包括 score 值等于 min 或 max )的成员的数量。
      * 关于参数 min 和 max 的详细使用方法，请参考 ZRANGEBYSCORE 命令。
      */
-    public Long zcount(Object key, double min, double max) {
+    public static Long zcount(Object key, double min, double max) {
         Jedis jedis = getJedis();
         try {
             return jedis.zcount(keyToBytes(key), min, max);
@@ -1097,7 +1091,7 @@ public class RedisUtil {
     /**
      * 为有序集 key 的成员 member 的 score 值加上增量 increment 。
      */
-    public Double zincrby(Object key, double score, Object member) {
+    public static Double zincrby(Object key, double score, Object member) {
         Jedis jedis = getJedis();
         try {
             return jedis.zincrby(keyToBytes(key), score, valueToBytes(member));
@@ -1112,7 +1106,7 @@ public class RedisUtil {
      * 如果你需要成员按 score 值递减(从大到小)来排列，请使用 ZREVRANGE 命令。
      */
     @SuppressWarnings("rawtypes")
-    public Set zrange(Object key, long start, long end) {
+    public static Set zrange(Object key, long start, long end) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> data = jedis.zrange(keyToBytes(key), start, end);
@@ -1130,7 +1124,7 @@ public class RedisUtil {
      * 除了成员按 score 值递减的次序排列这一点外， ZREVRANGE 命令的其他方面和 ZRANGE 命令一样。
      */
     @SuppressWarnings("rawtypes")
-    public Set zrevrange(Object key, long start, long end) {
+    public static Set zrevrange(Object key, long start, long end) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> data = jedis.zrevrange(keyToBytes(key), start, end);
@@ -1146,7 +1140,7 @@ public class RedisUtil {
      * 有序集成员按 score 值递增(从小到大)次序排列。
      */
     @SuppressWarnings("rawtypes")
-    public Set zrangeByScore(Object key, double min, double max) {
+    public static Set zrangeByScore(Object key, double min, double max) {
         Jedis jedis = getJedis();
         try {
             Set<byte[]> data = jedis.zrangeByScore(keyToBytes(key), min, max);
@@ -1162,7 +1156,7 @@ public class RedisUtil {
      * 排名以 0 为底，也就是说， score 值最小的成员排名为 0 。
      * 使用 ZREVRANK 命令可以获得成员按 score 值递减(从大到小)排列的排名。
      */
-    public Long zrank(Object key, Object member) {
+    public static Long zrank(Object key, Object member) {
         Jedis jedis = getJedis();
         try {
             return jedis.zrank(keyToBytes(key), valueToBytes(member));
@@ -1175,7 +1169,7 @@ public class RedisUtil {
      * 排名以 0 为底，也就是说， score 值最大的成员排名为 0 。
      * 使用 ZRANK 命令可以获得成员按 score 值递增(从小到大)排列的排名。
      */
-    public Long zrevrank(Object key, Object member) {
+    public static Long zrevrank(Object key, Object member) {
         Jedis jedis = getJedis();
         try {
             return jedis.zrevrank(keyToBytes(key), valueToBytes(member));
@@ -1199,7 +1193,7 @@ public class RedisUtil {
      * 返回有序集 key 中，成员 member 的 score 值。
      * 如果 member 元素不是有序集 key 的成员，或 key 不存在，返回 nil 。
      */
-    public Double zscore(Object key, Object member) {
+    public static Double zscore(Object key, Object member) {
         Jedis jedis = getJedis();
         try {
             return jedis.zscore(keyToBytes(key), valueToBytes(member));
@@ -1211,10 +1205,10 @@ public class RedisUtil {
      * 清空redis全部数据
      * @return
      */
-    public String flushDB(){
+    public static String flushDB(){
         Jedis jedis = null;
         try{
-            jedis = this.getJedis();
+            jedis = getJedis();
             return jedis.flushDB();
         }finally{
             jedis.close();
@@ -1223,10 +1217,10 @@ public class RedisUtil {
     /**
      * 查看redis里有多少数据
      */
-    public long dbSize(){
+    public static long dbSize(){
         Jedis jedis = null;
         try{
-            jedis = this.getJedis();
+            jedis = getJedis();
             return jedis.dbSize();
         }finally{
             jedis.close();

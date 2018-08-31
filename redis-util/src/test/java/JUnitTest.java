@@ -1,8 +1,4 @@
-import com.alibaba.fastjson.JSON;
-import com.github.sky.Redis;
 import com.github.sky.RedisUtil;
-import com.github.sky.serializer.ISerializer;
-import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -17,7 +13,6 @@ public class JUnitTest {
     public void testSetValue(){
         RedisUtil.set("a", 1);
         int a = RedisUtil.get("a");
-        System.out.println(a);
     }
 }
 
