@@ -9,16 +9,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.sky</groupId>
     <artifactId>email-util</artifactId>
     <packaging>jar</packaging>
     <version>1.0.0</version>
 
     <!-- 集中定义依赖版本号 -->
     <properties>
-        <junit.version>4.13.1</junit.version>
+        <junit.version>4.12</junit.version>
         <spring.version>4.3.5.RELEASE</spring.version>
-        <spring.security.version>5.4.0</spring.security.version>
+        <spring.security.version>4.1.4.RELEASE</spring.security.version>
 
         <mybatis.version>3.2.8</mybatis.version>
         <mybatis.spring.version>1.2.2</mybatis.spring.version>
@@ -45,9 +44,9 @@
         <fst.version>2.04</fst.version>
         <solrj.version>4.10.3</solrj.version>
 
-        <validator.version>5.3.6.Final</validator.version>
+        <validator.version>5.2.4.Final</validator.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
-        <xstream.version>1.4.10-java7</xstream.version>
+        <xstream.version>1.4.7</xstream.version>
 
         <guava.version>17.0</guava.version>
         <el.version>3.0.0</el.version>

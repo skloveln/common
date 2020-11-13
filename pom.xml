@@ -2,22 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.sky</groupId>
     <artifactId>common</artifactId>
-    <packaging>pom</packaging>
     <version>1.0.0</version>
-
-    <name>common</name>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maveredis-utiln.compiler.source>1.7</maveredis-utiln.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.compilerVersion>1.7</maven.compiler.compilerVersion>
-    </properties>
+    <packaging>pom</packaging>
 
     <modules>
         <module>redis-util</module>
@@ -25,6 +15,13 @@
         <module>lock-util</module>
         <module>email-util</module>
     </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maveredis-utiln.compiler.source>1.8</maveredis-utiln.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+    </properties>
 
     <profiles>
         <!-- 多环境配置 -->
